@@ -214,7 +214,7 @@ class HMM(ModelGibbsSampling, ModelEM):
         return dict(zip(states,np.linspace(0,1,numstates,endpoint=True)))
 
     def plot_observations(self,colors=None,states_objs=None):
-        self.obs_distns[0]._plot_setup(self.obs_distns)
+        # self.obs_distns[0]._plot_setup(self.obs_distns)
         if colors is None:
             colors = self._get_colors()
         if states_objs is None:
@@ -227,8 +227,8 @@ class HMM(ModelGibbsSampling, ModelEM):
                 o.plot(
                         color=cmap(colors[state]),
                         data=[s.data[s.stateseq == state] if s.data is not None else None
-                            for s in states_objs],
-                        label='%d' % state)
+                            for s in states_objs]),
+                        # label='%d' % state)
         plt.title('Observation Distributions')
 
     def plot(self,color=None,legend=True):

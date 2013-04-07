@@ -9,7 +9,7 @@ from ..util import general as util # perhaps a confusing name :P
 import os
 base_path = os.path.split(os.path.realpath(__file__))[0]
 include_path = os.path.abspath(os.path.join(base_path, "../deps/Eigen3"))
-print include_path
+
 class HSMMStatesPython(object):
     '''
     HSMM states distribution class. Connects the whole model.

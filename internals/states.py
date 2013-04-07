@@ -6,6 +6,10 @@ import scipy.weave
 from ..util.stats import sample_discrete, sample_discrete_from_log
 from ..util import general as util # perhaps a confusing name :P
 
+import os
+base_path = os.path.split(os.path.realpath(__file__))[0]
+include_path = os.path.abspath(os.path.join(base_path, "../deps/Eigen3"))
+print include_path
 class HSMMStatesPython(object):
     '''
     HSMM states distribution class. Connects the whole model.
@@ -256,7 +260,7 @@ class HSMMStatesEigen(HSMMStatesPython):
 
         scipy.weave.inline(self.sample_forwards_codestr,
                 ['betal','betastarl','aBl','stateseq','A','pi0','apmf'],
-                headers=['<Eigen/Core>'],include_dirs=['/usr/local/include/eigen3'],
+                headers=['<Eigen/Core>'],include_dirs=[include_path],
                 extra_compile_args=['-O3','-DNDEBUG'])#,'-march=native'])
 
 
@@ -435,7 +439,7 @@ class HMMStatesEigen(HMMStatesPython):
         betal = np.zeros((self.T,self.state_dim))
 
         scipy.weave.inline(self.messages_backwards_codestr,['AT','betal','aBl','T'],
-                headers=['<Eigen/Core>'],include_dirs=['/usr/local/include/eigen3'],
+                headers=['<Eigen/Core>'],include_dirs=[include_path],
                 extra_compile_args=['-O3','-DNDEBUG'])
 
         return betal
@@ -448,7 +452,7 @@ class HMMStatesEigen(HMMStatesPython):
         stateseq = np.zeros(T,dtype=np.int32)
 
         scipy.weave.inline(self.sample_forwards_codestr,['A','T','pi0','stateseq','aBl','betal'],
-                headers=['<Eigen/Core>','<limits>'],include_dirs=['/usr/local/include/eigen3'],
+                headers=['<Eigen/Core>','<limits>'],include_dirs=[include_path],
                 extra_compile_args=['-O3','-DNDEBUG'])
 
         self.stateseq = stateseq

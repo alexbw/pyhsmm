@@ -1,7 +1,14 @@
 import numpy as np
 from numpy import newaxis as na
 from numpy.random import random
+import os
+from uuid import uuid4
+import tempfile
 import scipy.weave
+the_path = os.path.join(tempfile.tempdir,str(uuid4()))
+os.makedirs(the_path)
+scipy.weave.catalog.default_dir.cached_path = the_path
+print "Alright"
 
 from ..util.stats import sample_discrete, sample_discrete_from_log
 from ..util import general as util # perhaps a confusing name :P

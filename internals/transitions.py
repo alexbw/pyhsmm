@@ -14,6 +14,7 @@ from ..util.general import rle
 
 # TODO scaling by self.state_dim in concresampling is the confusing result of
 # having a DirGamma object and not a WLDPGamma object! make one
+# TODO reuse Multinomial/Categorical code
 
 class ConcentrationResampling(object):
     def __init__(self,state_dim,alpha_a_0,alpha_b_0,gamma_a_0,gamma_b_0):
@@ -24,10 +25,10 @@ class ConcentrationResampling(object):
         # multiply by state_dim because the trans objects divide by it (since
         # their parameters correspond to the DP parameters, and so they convert
         # into weak limit scaling)
-        self.alpha_obj.resample(self.trans_counts,weighted_cols=self.beta,niter=5)
-        self.alpha = self.alpha_obj.concentration*self.state_dim
-        self.gamma_obj.resample(self.m,niter=5)
-        self.gamma = self.gamma_obj.concentration*self.state_dim
+        self.alpha_obj.resample(self.trans_counts,weighted_cols=self.beta)
+        self.alpha = self.alpha_obj.concentration
+        self.gamma_obj.resample(self.m)
+        self.gamma = self.gamma_obj.concentration
 
 ######################
 #  HDP-HMM classes  #
@@ -165,7 +166,7 @@ class UniformTransitionsFixedSelfTrans(HDPHMMTransitions):
 
         for itr in range(niter):
             aug_trans_counts = self._augment_transitions(trans_counts)
-            self.pi.resample(count_data=aug_trans_counts.sum(0))
+            self.pi.resample(aug_trans_counts.sum(0))
 
         self._set_A()
 
@@ -186,13 +187,13 @@ class UniformTransitionsFixedSelfTrans(HDPHMMTransitions):
 
     @classmethod
     def test_sampling(cls,N=50,K=10,alpha_0=4.,lmbda=0.95):
-        from ..basic.distributions import Multinomial
+        from ..basic.distributions import Categorical
         from matplotlib import pyplot as plt
 
         true_pi = np.random.dirichlet(np.repeat(alpha_0/K,K))
         counts = np.array([np.random.multinomial(N,true_pi) for i in range(K)]) # diagional ignored
 
-        pi = Multinomial(alpha_0=alpha_0,K=K)
+        pi = Categorical(alpha_0=alpha_0,K=K)
         trans = cls(lmbda,pi)
 
         plt.figure()
@@ -209,7 +210,7 @@ class UniformTransitionsFixedSelfTrans(HDPHMMTransitions):
     def max_likelihood(self,expectations_list):
         trans_softcounts = self._count_weighted_transitions(expectations_list,self.A)
         trans_softcounts = self._E_augment_transitions(trans_softcounts)
-        self.pi.max_likelihood_countdata(trans_softcounts.sum(0))
+        self.pi.max_likelihood(trans_softcounts.sum(0))
         self._set_A()
 
     def _E_augment_transitions(self,trans_softcounts):
@@ -252,7 +253,7 @@ class UniformTransitions(UniformTransitionsFixedSelfTrans):
 
     @classmethod
     def test_sampling(cls,N=50,K=10,alpha_0=4.,lmbda_a_0=20.,lmbda_b_0=1.,true_lmbda=0.95):
-        from ..basic.distributions import Multinomial
+        from ..basic.distributions import Categorical
         from matplotlib import pyplot as plt
 
         true_pi = np.random.dirichlet(np.repeat(alpha_0/K,K))
@@ -261,7 +262,7 @@ class UniformTransitions(UniformTransitionsFixedSelfTrans):
         for i,tot in enumerate(counts.sum(1)):
             counts[i,i] = np.random.geometric(1-true_lmbda,size=tot).sum()
 
-        pi = Multinomial(alpha_0=alpha_0,K=K)
+        pi = Categorical(alpha_0=alpha_0,K=K)
         trans = cls(lmbda_a_0=lmbda_a_0,lmbda_b_0=lmbda_b_0,pi=pi)
 
         plt.figure()

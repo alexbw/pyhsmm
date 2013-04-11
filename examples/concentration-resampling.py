@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 np.seterr(divide='ignore') # these warnings are usually harmless for this code
 from matplotlib import pyplot as plt
+import scipy.stats as stats
 
 import pyhsmm
 from pyhsmm.util.text import progprint_xrange
@@ -51,8 +52,8 @@ dur_distns = [pyhsmm.distributions.PoissonDuration(**dur_hypparams) for state in
 posteriormodel = pyhsmm.models.HSMM(
         # NOTE: instead of passing in alpha_0 and gamma_0, we pass in parameters
         # for priors over those concentration parameters
-        alpha_a_0=0.5,alpha_b_0=3.,
-        gamma_a_0=0.5,gamma_b_0=3.,
+        alpha_a_0=1.,alpha_b_0=1./4,
+        gamma_a_0=1.,gamma_b_0=1./4,
         init_state_concentration=6.,
         obs_distns=obs_distns,
         dur_distns=dur_distns,trunc=70)
@@ -64,5 +65,10 @@ for idx in progprint_xrange(100):
 plt.figure()
 posteriormodel.plot()
 plt.gcf().suptitle('Sampled after 100 iterations')
+
+plt.figure()
+t = np.linspace(0.01,30,1000)
+plt.plot(t,stats.gamma.pdf(t,1.,scale=4.)) # NOTE: numpy/scipy scale is inverted compared to my scale
+plt.title('Prior on concentration parameters')
 
 plt.show()

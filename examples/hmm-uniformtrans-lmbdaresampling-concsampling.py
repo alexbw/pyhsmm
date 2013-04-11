@@ -50,7 +50,7 @@ Nmax = 25
 
 obs_distns = [pyhsmm.distributions.Gaussian(**obs_hypparams) for state in xrange(Nmax)]
 trans_distn = transitions.UniformTransitions(
-        pi=pyhsmm.distributions.MultinomialConcentration(1.,2.,K=Nmax),
+        pi=pyhsmm.distributions.MultinomialAndConcentration(1.,2.,K=Nmax),
         lmbda_a_0=9.,lmbda_b_0=1.)
 
 posteriormodel = pyhsmm.models.HMM(

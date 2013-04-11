@@ -34,7 +34,7 @@ obs_hypparams = dict(
 
 obs_distns = [pyhsmm.distributions.Gaussian(**obs_hypparams) for state in xrange(Nmax)]
 trans_distn = transitions.UniformTransitions(
-        pi=pyhsmm.distributions.MultinomialAndConcentration(1.,2.,K=Nmax),
+        pi=pyhsmm.distributions.MultinomialAndConcentration(1.,1./2,K=Nmax),
         lmbda_a_0=10*98.,lmbda_b_0=10*2.) # mean self-trans prob 0.98, mean dwell time 1/(1-0.98)=50 frames
 
 posteriormodel = pyhsmm.models.HMM(

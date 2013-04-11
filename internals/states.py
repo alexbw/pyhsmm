@@ -194,7 +194,6 @@ class HMMStatesEigen(HMMStatesPython):
 
         self.stateseq = stateseq
 
->>>>>>> 0e45bb76b788a3fe19cab0b5d04a2e0064739b42
 
 class HSMMStatesPython(object):
     '''

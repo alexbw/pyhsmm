@@ -26,7 +26,7 @@ obs_hypparams = {'mu_0':np.zeros(obs_dim),
 
 true_obs_distns = [pyhsmm.distributions.Gaussian(**obs_hypparams) for state in xrange(N)]
 true_trans_distn = transitions.UniformTransitionsFixedSelfTrans(
-        pi=pyhsmm.distributions.Multinomial(alpha_0=10.*N,K=N),
+        pi=pyhsmm.distributions.Categorical(alpha_0=10.*N,K=N),
         lmbda=0.9)
 
 truemodel = pyhsmm.models.HMM(
@@ -50,7 +50,7 @@ Nmax = 25
 
 obs_distns = [pyhsmm.distributions.Gaussian(**obs_hypparams) for state in xrange(Nmax)]
 trans_distn = transitions.UniformTransitions(
-        pi=pyhsmm.distributions.MultinomialConcentration(1.,2.,K=Nmax),
+        pi=pyhsmm.distributions.Categorical(1.,2.,K=Nmax),
         lmbda_a_0=9.,lmbda_b_0=1.)
 
 posteriormodel = pyhsmm.models.HMM(

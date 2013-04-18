@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from matplotlib import cm
 
 from basic.abstractions import ModelGibbsSampling, ModelEM
+import basic.distributions
 from internals import states, initial_state, transitions
 
 class HMM(ModelGibbsSampling, ModelEM):
@@ -338,7 +339,7 @@ class HSMM(HMM, ModelGibbsSampling, ModelEM):
     def log_likelihood(self,data,trunc=None,**kwargs):
         s = states.HSMMStates(model=self,data=data,trunc=trunc,
                 stateseq=np.zeros(len(data)),**kwargs)
-        betal, betastarl = s.messages_backwards()
+        betal, _ = s.messages_backwards()
         return np.logaddexp.reduce(np.log(self.init_state_distn.pi_0) + betal[0] + s.aBl[0])
 
     ### generation
@@ -456,4 +457,14 @@ class HSMMGeoApproximation(HSMM):
         else:
             self.states_list.append(states.HSMMStatesGeoDynamicApproximation(
                 self,data=data,stateseq=stateseq,censoring=censoring,trunc=None,**kwargs))
+
+class HSMMIntNegBin(HSMM):
+    def __init__(self,obs_distns,dur_distns,*args,**kwargs):
+        assert all(isinstance(d,basic.distributions.NegativeBinomialIntegerR) for d in dur_distns), \
+                'duration distributions must be instances of NegativeBinomialIntegerR'
+        super(HSMMIntNegBin,self).__init__(obs_distns,dur_distns,*args,**kwargs)
+
+    def add_data(self,data,stateseq=None,censoring=True,**kwargs):
+        self.states_list.append(states.HSMMStatesIntegerNegativeBinomial(
+            self,data=data,stateseq=stateseq,censoring=censoring,**kwargs))
 
